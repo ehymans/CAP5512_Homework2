@@ -28,6 +28,8 @@ public class Chromo
 *                              CONSTRUCTORS                                    *
 *******************************************************************************/
 
+public int[] buildingBlockCounts;
+
 	public Chromo(){
 
 		//  Set gene values to a randum sequence of 1's and 0's
@@ -41,6 +43,10 @@ public class Chromo
 				this.chromo = chromo + geneBit;
 			}
 		}
+
+		this.buildingBlockCounts = new int[14];
+		
+
 
 		this.rawFitness = -1;   //  Fitness not yet evaluated
 		this.sclFitness = -1;   //  Fitness not yet scaled
@@ -151,7 +157,7 @@ public class Chromo
 			return(j);
 
 		case 2:     //  Tournament Selection
-			int tournamentSize = 3;  // You can change this to your desired tournament size
+			int tournamentSize = 7;  // desired tournament size
 			int best = -1;
 			double bestFitness = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < tournamentSize; i++) {
@@ -202,6 +208,8 @@ public class Chromo
 		int xoverPoint1;
 		int xoverPoint2;
 
+        int temp;
+
 		switch (Parameters.xoverType){
 
 		case 1:     //  Single Point Crossover
@@ -212,11 +220,32 @@ public class Chromo
 			child1.chromo = parent1.chromo.substring(0,xoverPoint1) + parent2.chromo.substring(xoverPoint1);
 			child2.chromo = parent2.chromo.substring(0,xoverPoint1) + parent1.chromo.substring(xoverPoint1);
 			break;
-
+        
 		case 2:     //  Two Point Crossover
+        
+            // Select two crossover points
+            xoverPoint1 = (int)(Search.r.nextDouble() * (Parameters.numGenes * Parameters.geneSize));
+            xoverPoint2 = (int)(Search.r.nextDouble() * (Parameters.numGenes * Parameters.geneSize));
+            
+            // check if first crossover point is below second, if not swap them
+            if (xoverPoint1 > xoverPoint2){
+                temp = xoverPoint1;
+                xoverPoint1 = xoverPoint2;
+                xoverPoint2 = temp;
+            }
+    
+            // Create child using two crossover points
+            child1.chromo = parent1.chromo.substring(0, xoverPoint1) +
+                            parent2.chromo.substring(xoverPoint1, xoverPoint2) +
+                            parent1.chromo.substring(xoverPoint2);
+            child2.chromo = parent2.chromo.substring(0, xoverPoint1) +
+                            parent1.chromo.substring(xoverPoint1, xoverPoint2) +
+                            parent2.chromo.substring(xoverPoint2);
+            break;
 		
 		case 3:     //  Uniform Crossover
-        for (int i = 0; i < (Parameters.numGenes * Parameters.geneSize); i++) {
+        for (int i = 0; i < (Parameters.numGenes * Parameters.geneSize); i++) 
+		{
             randnum = Search.r.nextDouble();
             if (randnum > 0.5) {
                 child1.chromo += parent1.chromo.charAt(i);
