@@ -57,22 +57,31 @@ public class Search {
     private static int[][] buildingBlockCounts;  // Holds count of each building block per generation
 
 
+	public static double calculateHammingDistance(Chromo[] members) 
+	{
+		int sumDistances = 0;
+		int c = 0;
+		
+		for (int i = 0; i < members.length - 1; i++) {
+			for (int j = i + 1; j < members.length; j++) {
+				for (int k = 0; k < members[j].chromo.length(); k++) {
+					if (members[i].chromo.charAt(k) != members[j].chromo.charAt(k)) {
+						sumDistances++;
+					}
+				}
+				c++;
+			}
+		}
+	
+		return c > 0 ? (double) sumDistances / c : 0;
+	}
+	
 
-/*******************************************************************************
-*                              CONSTRUCTORS                                    *
-*******************************************************************************/
-
-
-/*******************************************************************************
-*                             MEMBER METHODS                                   *
-*******************************************************************************/
-
-
-/*******************************************************************************
-*                             STATIC METHODS                                   *
-*******************************************************************************/
-
-	public static void main(String[] args) throws java.io.IOException{
+	/////////////////////////
+	//// MAIN METHOD ////////
+	/////////////////////////
+	public static void main(String[] args) throws java.io.IOException
+	{
 
 		Calendar dateAndTime = Calendar.getInstance(); 
 		Date startTime = dateAndTime.getTime();
@@ -84,16 +93,17 @@ public class Search {
 	//  Write Parameters To Summary Output File
 		String summaryFileName = Parameters.expID + "_summary.csv";
 		FileWriter summaryOutput = new FileWriter(summaryFileName);
-        summaryOutput.write("Generation,Average Fitness,Best Fitness,Standard Deviation\n"); // CSV header
+        summaryOutput.write("Generation,Average Fitness,Best Fitness,Standard Deviation,Average Hamming Distance\n"); // Updated CSV header
 		//parmValues.outputParameters(summaryOutput);
 
 	//	Set up Fitness Statistics matrix
     // updated fitness stats to include 3 rows --> to store the standard deviation stats
-		fitnessStats = new double[3][Parameters.generations];
+		fitnessStats = new double[4][Parameters.generations];
 		for (int i=0; i<Parameters.generations; i++){
 			fitnessStats[0][i] = 0;
 			fitnessStats[1][i] = 0;
             fitnessStats[2][i] = 0;
+			fitnessStats[3][i] = 0;			// Hamming distance here 
 		}
 
 	//	Problem Specific Setup - For new new fitness function problems, create
@@ -102,7 +112,11 @@ public class Search {
  
 	if (Parameters.problemType.equals("RR2"))
 	{
-			problem = new RoyalRoadR2();
+		problem = new RoyalRoadR2();
+	}
+	else if (Parameters.problemType.equals("RR1"))
+	{
+		problem = new RoyalRoadR1();
 	}
 	else System.out.println("Invalid Problem Type");
 
@@ -152,7 +166,8 @@ public class Search {
 				bestOfGenChromo.rawFitness = defaultBest;
 
 				//	Test Fitness of Each Member
-				for (int i=0; i<Parameters.popSize; i++){
+				for (int i=0; i<Parameters.popSize; i++)
+				{
 
 					member[i].rawFitness = 0;
 					member[i].sclFitness = 0;
@@ -200,10 +215,15 @@ public class Search {
 					}
 				}
 
+				// After calculating fitness for each member
+				double avgHammingDistance = calculateHammingDistance(member);
+				//System.out.println("Average Hamming Distance in Generation " + G + ": " + avgHammingDistance);
+
 				// Accumulate fitness statistics
 				fitnessStats[0][G] += sumRawFitness / Parameters.popSize;       // average
 				fitnessStats[1][G] += bestOfGenChromo.rawFitness;               // best
                 fitnessStats[2][G] += stdevRawFitness;                          // standard deviation
+				fitnessStats[3][G] += avgHammingDistance;						// Hamming distance - also stored within the matrix.
 
 				averageRawFitness = sumRawFitness / Parameters.popSize;
 				stdevRawFitness = Math.sqrt(
@@ -214,7 +234,7 @@ public class Search {
 							);
 
 				// Output generation statistics to screen
-				System.out.println(R + "\t" + G +  "\t" + (int)bestOfGenChromo.rawFitness + "\t" + averageRawFitness + "\t" + stdevRawFitness);
+				//System.out.println(R + "\t" + G +  "\t" + (int)bestOfGenChromo.rawFitness + "\t" + averageRawFitness + "\t" + stdevRawFitness);
 
 				// Output generation statistics to summary file
 				//summaryOutput.write(" R ");
@@ -373,14 +393,15 @@ public class Search {
 		//problem.doPrintGenes(bestOverAllChromo, summaryOutput);
 
 		//	Output Fitness Statistics matrix
-		//summaryOutput.write("Gen                 AvgFit              BestFit             StdDev\n");
-		for (int i=0; i<Parameters.generations; i++){
+		//summaryOutput.write("Generation,Average Fitness,Best Fitness,Standard Deviation, Average Hamming Distance\n"); // Updated CSV header
+		for (int i=0; i<Parameters.generations; i++)
+		{
 			//Hwrite.left(i, 15, summaryOutput);
 			//Hwrite.left(fitnessStats[0][i]/Parameters.numRuns, 20, 2, summaryOutput);
 			//Hwrite.left(fitnessStats[1][i]/Parameters.numRuns, 20, 2, summaryOutput);
             //Hwrite.left(fitnessStats[2][i]/Parameters.numRuns, 20, 2, summaryOutput);
-			//summaryOutput.write("\n");
-            summaryOutput.write(i + "," + (fitnessStats[0][i] / Parameters.numRuns) + "," + (fitnessStats[1][i] / Parameters.numRuns) + "," + (fitnessStats[2][i] / Parameters.numRuns) + "\n");
+			//summaryOutput.write("\n"); 
+            summaryOutput.write(i + "," + (fitnessStats[0][i] / Parameters.numRuns) + "," + (fitnessStats[1][i] / Parameters.numRuns) + "," + (fitnessStats[2][i] / Parameters.numRuns) + "," + (fitnessStats[3][i] / Parameters.numRuns) + "\n");
 		}
 
 		summaryOutput.write("\n");

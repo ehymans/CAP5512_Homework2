@@ -35,7 +35,8 @@ public int[] buildingBlockCounts;
 		//  Set gene values to a randum sequence of 1's and 0's
 		char geneBit;
 		chromo = "";
-		for (int i=0; i<Parameters.numGenes; i++){
+		for (int i=0; i<Parameters.numGenes; i++)
+		{
 			for (int j=0; j<Parameters.geneSize; j++){
 				randnum = Search.r.nextDouble();
 				if (randnum > 0.5) geneBit = '0';
@@ -60,7 +61,8 @@ public int[] buildingBlockCounts;
 
 	//  Get Alpha Represenation of a Gene **************************************
 
-	public String getGeneAlpha(int geneID){
+	public String getGeneAlpha(int geneID)
+	{
 		int start = geneID * Parameters.geneSize;
 		int end = (geneID+1) * Parameters.geneSize;
 		String geneAlpha = this.chromo.substring(start, end);
@@ -69,14 +71,16 @@ public int[] buildingBlockCounts;
 
 	//  Get Integer Value of a Gene (Positive or Negative, 2's Compliment) ****
 
-	public int getIntGeneValue(int geneID){
+	public int getIntGeneValue(int geneID)
+	{
 		String geneAlpha = "";
 		int geneValue;
 		char geneSign;
 		char geneBit;
 		geneValue = 0;
 		geneAlpha = getGeneAlpha(geneID);
-		for (int i=Parameters.geneSize-1; i>=1; i--){
+		for (int i=Parameters.geneSize-1; i>=1; i--)
+		{
 			geneBit = geneAlpha.charAt(i);
 			if (geneBit == '1') geneValue = geneValue + (int) Math.pow(2.0, Parameters.geneSize-i-1);
 		}
@@ -93,7 +97,8 @@ public int[] buildingBlockCounts;
 		char geneBit;
 		geneValue = 0;
 		geneAlpha = getGeneAlpha(geneID);
-		for (int i=Parameters.geneSize-1; i>=0; i--){
+		for (int i=Parameters.geneSize-1; i>=0; i--)
+		{
 			geneBit = geneAlpha.charAt(i);
 			if (geneBit == '1') geneValue = geneValue + (int) Math.pow(2.0, Parameters.geneSize-i-1);
 		}
@@ -111,10 +116,12 @@ public int[] buildingBlockCounts;
 
 		case 1:     //  Replace with new random number
 
-			for (int j=0; j<(Parameters.geneSize * Parameters.numGenes); j++){
+			for (int j=0; j<(Parameters.geneSize * Parameters.numGenes); j++)
+			{
 				x = this.chromo.charAt(j);
 				randnum = Search.r.nextDouble();
-				if (randnum < Parameters.mutationRate){
+				if (randnum < Parameters.mutationRate)
+				{
 					if (x == '1') x = '0';
 					else x = '1';
 				}
@@ -145,7 +152,8 @@ public int[] buildingBlockCounts;
 
 		case 1:     // Proportional Selection
 			randnum = Search.r.nextDouble();
-			for (j=0; j<Parameters.popSize; j++){
+			for (j=0; j<Parameters.popSize; j++)
+			{
 				rWheel = rWheel + Search.member[j].proFitness;
 				if (randnum < rWheel) return(j);
 			}
@@ -162,7 +170,8 @@ public int[] buildingBlockCounts;
 			double bestFitness = Double.NEGATIVE_INFINITY;
 			for (int i = 0; i < tournamentSize; i++) {
 				int temp = Search.r.nextInt(Parameters.popSize);
-				if (Search.member[temp].rawFitness > bestFitness) {
+				if (Search.member[temp].rawFitness > bestFitness) 
+				{
 					best = temp;
 					bestFitness = Search.member[temp].rawFitness;
 				}

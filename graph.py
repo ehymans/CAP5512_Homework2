@@ -1,24 +1,25 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Replace 'your_file.csv' with the path to your actual CSV file
-csv_file_path = 'royalroad2_summary.csv'
+# Load the CSV file
+df = pd.read_csv('RR2_Tournament_7.csv')
 
-# Read the CSV file
-data = pd.read_csv(csv_file_path)
+# Set the 'Generation' column as the X-axis
+x = df['Generation']
 
-# Assuming the first two columns have headers 'Column1' and 'Column2'
-# If they don't, you can use data.columns[0] and data.columns[1] instead
-x = data[data.columns[0]]
-y = data[data.columns[1]]
+# Plotting each line
+plt.plot(x, df['Average Fitness'], label='Average Fitness')
+plt.plot(x, df['Best Fitness'], label='Best Fitness')
+plt.plot(x, df['Standard Deviation'], label='Standard Deviation')
+plt.plot(x, df['Average Hamming Distance'], label='Average Hamming Distance')
 
-# Create the plot
-plt.figure(figsize=(10, 6))  # Adjust the figure size as needed
-plt.plot(x, y, marker='o')  # You can change the marker style if needed
+# Adding title and labels
+plt.title('RR2 Stats for Tournament Size 7')
+plt.xlabel('Generation')
+plt.ylabel('Fitness / StdDev / Hamming Distance')
 
-plt.title('Graph of the first two columns')
-plt.xlabel(data.columns[0])  # Set the x-axis label to the first column header
-plt.ylabel(data.columns[1])  # Set the y-axis label to the second column header
+# Adding a legend
+plt.legend()
 
-plt.grid(True)
+# Display the plot
 plt.show()
